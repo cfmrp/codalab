@@ -1,19 +1,28 @@
-all: competition/scoring_program.zip competition/dev_data.zip competition/test_data.zip competition.zip submission.zip
+all: competition/scoring_program.zip competition/training09.tgz competition/evaluation09.tgz competition/companion.tgz competition/sample.tgz competition.zip submission.zip
 
 competition/scoring_program.zip: scoring_program/*
-	cd scoring_program && zip -r ../competition/scoring_program.zip * && cd ..
+	cd scoring_program && git clone https://github.com/cfmrp/mtool && zip -r ../competition/scoring_program.zip * && cd ..
 
-competition/dev_data.zip: dev_data/*
-	cd dev_data && zip -r  ../competition/dev_data.zip * && cd ..
+competition/training09.tgz: mrp
+	cd mrp/2019/training && make release && cd ../../.. && cp mrp/2019/training09.tgz competition/
 
-competition/test_data.zip: test_data/*
-	cd test_data && zip -r  ../competition/test_data.zip * && cd ..
+competition/evaluation09.tgz: mrp
+	cd mrp/2019/evaluation && make release && cd ../../.. && cp mrp/2019/evaluation09.tgz competition/
 
-competition.zip: competition/* competition/scoring_program.zip competition/dev_data.zip competition/test_data.zip
+competition/companion.tgz: mrp
+	cd mrp/2019/companion && make release && cd ../../.. && cp mrp/2019/public/companion.tgz competition/
+
+competition/sample.tgz: mrp
+	cd mrp/2019/sample && make release && cd ../../.. && cp mrp/2019/public/sample.tgz competition/
+
+competition.zip: competition/* competition/scoring_program.zip competition/training09.tgz competition/evaluation09.tgz competition/companion.tgz competition/sample.tgz
 	cd competition && zip -r  ../competition.zip * && cd ..
 
-submission.zip: submission/*
-	cd submission && zip -r ../submission.zip * && cd ..
+submission.zip: competition/sample.tgz
+	mkdir -p sample && cd sample && tar xvzf ../competition/sample.tgz && zip -r ../submission.zip * && cd ..
+
+mrp:
+    svn checkout http://svn.nlpl.eu/mrp
 
 clean:
-	rm competition/scoring_program.zip competition/dev_data.zip competition/test_data.zip competition.zip submission.zip
+	rm competition/scoring_program.zip competition/training09.tgz competition/evaluation09.tgz competition/companion.tgz competition/sample.tgz competition.zip submission.zip

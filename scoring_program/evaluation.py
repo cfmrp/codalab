@@ -1,56 +1,52 @@
 #!/usr/bin/env python3
-import sys
 import os.path
-from collections import OrderedDict
-from semstr.evaluate import evaluate_all, Scores, passage_format, EVALUATORS, summarize
-from ucca.evaluation import LABELED, UNLABELED
-from ucca.constructions import CATEGORY_DESCRIPTIONS
+import sys
+
 import yaml
-from google.oauth2 import service_account
-import googleapiclient.discovery
 
-SERVICE_ACCOUNT_FILE = {}
+sys.path.append('mtool')
+from main import read_graphs
+import score
 
-PRACTICE_SPREADSHEET_ID = '1YXP22VAIVRtZngax0ZBuGCNYzprhAoxS46nr8n3mPcY'
-EVALUATION_SPREADSHEET_ID = '1b3b5dKH18Qr0zHvPJdFP6KMMBU3jlKaRk_xYC5a7RjE'
-POST_EVALUATION_SPREADSHEET_ID = '10wwmK25w13VlkKXBasIS1JJS4K6vG8DII2Lt6DOR0aU'
+"""
+The scoring program will have to follow the standard CodaLab directory structure for the reference data, the system
+submission, and the output ``scores.txt`` file:
+https://github.com/codalab/codalab-competitions/wiki/User_Building-a-Scoring-Program-for-a-Competition#directory-structure-for-submissions
 
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+Be sure that your evaluation script gives clear error messages when it fails.
+For example, if there is a formatting error in someone's submission, your script should explain the problem and exit
+with an error status (e.g., ``sys.exit("some error message")`` in Python).
 
-if __name__ == "__main__":
+Be sure that your evaluation script is writing the output in the right format; it should print lines of the format
+``<metric name>:<score>`` in the  ``scores.txt`` file. For example:
+
+        correct:1
+        f-score:0.74
+"""
+
+
+def find_files(submission_dir):
+    return [os.path.join(root, fn)
+            for root, dirnames, fns in os.walk(submission_dir)
+            for fn in fns if fn.lower().endswith(".mrp")]
+
+
+def filter_by_framework(graphs, framework):
+    if framework == "all":
+        return graphs
+    return [graph for graph in graphs if graph.framework == framework]
+
+
+def main():
     # as per the metadata file, input and output directories are the arguments
     [_, input_dir, output_dir] = sys.argv
     submission_dir = os.path.join(input_dir, 'res')
-    truth_dir = os.path.join(input_dir, 'ref')
-
-    langs = ["UCCA_English-Wiki", "UCCA_English-20K", "UCCA_German-20K", "UCCA_French-20K"]
-    tracks = ["open", "closed"]
-
-    # Handle top directory in submission path
-    while not any(os.path.exists(os.path.join(submission_dir, track)) for track in tracks):
-        sub_dirs = [sub_dir for sub_dir in os.listdir(submission_dir) if not sub_dir.startswith(("__", "."))]
-        if not sub_dirs:
-            raise IOError("Could not find either of " + ", ".join(tracks) + " in " + submission_dir)
-        submission_dir = os.path.join(submission_dir, sub_dirs[0])
-
-    # Setup the Sheets API
-    creds = service_account.Credentials.from_service_account_info(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-    service = googleapiclient.discovery.build('sheets', 'v4', credentials=creds)
-
+    gold_dir = os.path.join(input_dir, 'ref')
+    files = find_files(submission_dir)
+    gold_files = find_files(gold_dir)
     metadata = yaml.load(open(os.path.join(input_dir, 'metadata'), 'r'))
     for key, value in metadata.items():
-        print(key + ': ')
-        print(str(value) + '\n')
-
-    if metadata["competition-phase"] == 1:
-        SPREADSHEET_ID = PRACTICE_SPREADSHEET_ID
-    elif metadata["competition-phase"] == 2:
-        SPREADSHEET_ID = EVALUATION_SPREADSHEET_ID
-    else:
-        SPREADSHEET_ID = POST_EVALUATION_SPREADSHEET_ID
-
-    competitions = [(lang, track) for lang in langs for track in tracks]
-    competitions.remove(("UCCA_French-20K", "closed"))
+        print(key + ': ' + str(value))
     with open(os.path.join(output_dir, 'scores.txt'), 'w') as output_file:
         with open(os.path.join(output_dir, 'scores.html'), 'w') as output_html_file:
             # html style
@@ -98,128 +94,45 @@ if __name__ == "__main__":
             output_html_file.write('<table style="width:100%">\n'
                                    '<thead>\n'
                                    '<tr>\n'
-                                   '<th rowspan="3">Track</th>\n'
-                                   '<th colspan="7">Labeled</th>\n'
-                                   '<th colspan="7">Unlabeled</th>\n'
-                                   '<th colspan="14" rowspan="2">Labeled fine-grained F1</th>\n'
-                                   '</tr>\n'
-                                   '<tr>\n'
-                                   '<th rowspan="2">Averaged F1</th>\n'
-                                   '<th colspan="3">Primary</th>\n'
-                                   '<th colspan="3">Remote</th>\n'
-                                   '<th rowspan="2">Averaged F1</th>\n'
-                                   '<th colspan="3">Primary</th>\n'
-                                   '<th colspan="3">Remote</th>\n'
-                                   '</tr>\n'
-                                   '<tr>\n'
+                                   '<th rowspan="3">Framework</th>\n'
                                    '<th>P</th>\n'
                                    '<th>R</th>\n'
                                    '<th>F1</th>\n'
-                                   '<th>P</th>\n'
-                                   '<th>R</th>\n'
-                                   '<th>F1</th>\n'
-                                   '<th>P</th>\n'
-                                   '<th>R</th>\n'
-                                   '<th>F1</th>\n'
-                                   '<th>P</th>\n'
-                                   '<th>R</th>\n'
-                                   '<th>F1</th>\n'
-                                   '<th>Adverbial (D)</th>\n'
-                                   '<th>Center (C)</th>\n'
-                                   '<th>Connector (N)</th>\n'
-                                   '<th>Elaborator (E)</th>\n'
-                                   '<th>Function (F)</th>\n'
-                                   '<th>Ground (G)</th>\n'
-                                   '<th>Linker (L)</th>\n'
-                                   '<th>ParallelScene (H)</th>\n'
-                                   '<th>Participant (A)</th>\n'
-                                   '<th>Process (P)</th>\n'
-                                   '<th>Punctuation (U)</th>\n'
-                                   '<th>Relator (R)</th>\n'
-                                   '<th>State (S)</th>\n'
-                                   '<th>Terminal (Terminal)</th>\n'
                                    '</tr>\n'
                                    '</thead>\n'
                                    '<tbody>\n')
 
-            # regular results - P,R,F1 for labeled/unlabeled
-            for (lang, track) in competitions:
-                competition = lang + "_" + track
-                if os.path.exists(os.path.join(truth_dir, lang)) and os.path.exists(
-                        os.path.join(submission_dir, track, lang)):
-                    values = [metadata["submitted-by"], metadata["competition-submission"],
-                              metadata["submitted-at"].strftime("%d.%m.%Y ")]
-                    print("Running evaluation on %s track" % competition)
+            graphs, _ = [graph for f in files for graph in read_graphs(f, format="mrp")]
+            if not graphs:
+                sys.exit("unable to read input graphs")
 
-                    # run evaluation
-                    files = [None if d is None else [os.path.join(d, f) for f in os.listdir(d) if
-                                                     not os.path.isdir(os.path.join(d, f))]
-                             if os.path.isdir(d) else [d] for d in
-                             (os.path.join(submission_dir, track, lang), os.path.join(truth_dir, lang), None)]
+            gold, _ = [graph for f in gold_files for graph in read_graphs(f, format="mrp")]
+            if not gold:
+                sys.exit("unable to read gold graphs")
 
-                    evaluate = EVALUATORS.get(passage_format(files[1][0])[1], EVALUATORS["amr"])
-                    results = list(evaluate_all(evaluate, files, format="amr", name="Evaluating", unlabeled=False,
-                                                matching_ids=True))
-                    summary = Scores(results)
+            # results - P, R, F1
+            for framework in ["all", "dm", "psd", "eds", "ucca", "amr"]:
+                print("Running '%s' evaluation" % framework)
 
-                    # write results to html file and append to values
-                    output_html_file.write("<tr>\n"
-                                           "<td>%s</td>" % competition)
+                # write results to html file and append to values
+                output_html_file.write("<tr>\n"
+                                       "<td>%s</td>" % framework)
 
-                    # labeled
-                    output_html_file.write("<td>%.3f</td>\n" % (summary.average_f1(LABELED)))
-                    values.append(round(summary.average_f1(LABELED), 3))
-                    for (title, field) in zip(summary.titles(LABELED), summary.fields(LABELED)):
-                        output_html_file.write("<td>%.3f</td>\n" % (float(field)))
-                        values.append(float(field))
+                result = score.mces.evaluate(filter_by_framework(gold, framework),
+                                             filter_by_framework(graphs, framework))
 
-                    # unlabeled
-                    output_html_file.write("<td>%.3f</td>\n" % (summary.average_f1(UNLABELED)))
-                    values.append(round(summary.average_f1(UNLABELED), 3))
-                    for (title, field) in zip(summary.titles(UNLABELED), summary.fields(UNLABELED)):
-                        output_html_file.write("<td>%.3f</td>\n" % (float(field)))
-                        values.append(float(field))
-
-                    # categories
-                    results = list(evaluate_all(evaluate, files, format="amr", unlabeled=False, matching_ids=True,
-                                                constructions=["categories"]))
-                    summary = Scores(results)
-                    summarize(summary)
-                    categories_results = {name: "-" for name in CATEGORY_DESCRIPTIONS.values() if
-                                          name not in ["LinkRelation", "LinkArgument", "Quantifier", "Time"]}
-                    for (title, field) in zip(summary.titles(LABELED), summary.fields(LABELED)):
-                        _, name, label, score = title.split("_")
-                        if name in CATEGORY_DESCRIPTIONS and name not in ["LR", "LA", "Q",
-                                                                          "T"] and score == "f1" and label == "labeled":
-                            categories_results[CATEGORY_DESCRIPTIONS[name]] = field
-
-                    for name, field in OrderedDict(sorted(categories_results.items(), key=lambda t: t[0])).items():
-                        if field == "-":
-
-                            output_html_file.write("<td>%s</td>\n" % ((field)))
-                            values.append(field)
-                        else:
-                            output_html_file.write("<td>%.3f</td>\n" % (float(field)))
-                            values.append(float(field))
-                    output_html_file.write("</tr>\n")
-
-                    # write results to google sheet
-                    body = {
-                        'values': [values, ]
-                    }
-                    result = service.spreadsheets().values().append(
-                        spreadsheetId=SPREADSHEET_ID, range=competition,
-                        valueInputOption="RAW", body=body).execute()
-                    print('{0} cells appended.'.format(result.get('updates').get('updatedCells')))
-                else:
-                    print("Results for %s track does not exists" % competition)
-
-            output_file.write("correct: -1\n")
+                if framework == "all":
+                    output_file.write("correct: %f\n" % result["all"]["f"])
+                output_html_file.write("<td>%.3f</td>\n" % result["all"]["p"])
+                output_html_file.write("<td>%.3f</td>\n" % result["all"]["r"])
+                output_html_file.write("<td>%.3f</td>\n" % result["all"]["f"])
+                output_html_file.write("</tr>\n")
 
             output_html_file.write("</tbody>\n"
-                                   "</table>\n")
-            output_html_file.write("<p> To see all results, have a look"
-                                   "<a href='https://docs.google.com/spreadsheets/d/" + SPREADSHEET_ID +
-                                   "'> here </a>.</p>"
+                                   "</table>\n"
                                    "</body>\n"
                                    "</html>")
+
+
+if __name__ == "__main__":
+    main()
