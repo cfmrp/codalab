@@ -16,33 +16,33 @@ phases:
     auto_migration: false
     color: orange
     description: Develop your system and try it out on training data.
-    input_data: training09.tgz
+    input_data: training09.zip
     is_scoring_only: true
     label: Practice
     max_submissions: 999
     max_submissions_per_day: 999
     phasenumber: 1
-    reference_data: sample.tgz
+    reference_data: sample.zip
     scoring_program: scoring_program.zip
     start_date: 2019-06-25 00:00:00+00:00
   1:
     auto_migration: false
     color: green
     description: Run the trained system on evaluation data and upload for evaluation.
-    input_data: evaluation09.tgz
+    input_data: input.zip
     is_scoring_only: true
     label: Evaluation
     max_submissions: 999
     max_submissions_per_day: 999
     phasenumber: 2
-    reference_data: evaluation_gold.zip
+    reference_data: evaluation09.zip
     scoring_program: scoring_program.zip
     start_date: 2019-07-08 00:00:00+00:00
   2:
     auto_migration: true
     color: purple
     description: ''
-    input_data: evaluation09.tgz
+    input_data: input.zip
     is_scoring_only: true
     label: Post-Evaluation
     max_submissions: 999
@@ -54,7 +54,7 @@ phases:
 leaderboard:
   columns:
     correct:
-      label: fscore
+      label: correct
       leaderboard: &id001
         label: Results
         rank: 1
