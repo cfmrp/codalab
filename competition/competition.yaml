@@ -11,12 +11,15 @@ enable_detailed_results: true
 admin_names: danielh,Omri.Abend,oe@ifi.uio.no.no
 html:
   overview: overview.html
+  evaluation: evaluation.html
+  terms: terms.html
+  data: data.html
 phases:
   0:
     auto_migration: false
     color: orange
     description: Develop your system and try it out on training data.
-    input_data: training09.zip
+    input_data: training.zip
     is_scoring_only: true
     label: Practice
     max_submissions: 999
@@ -35,7 +38,7 @@ phases:
     max_submissions: 999
     max_submissions_per_day: 999
     phasenumber: 2
-    reference_data: evaluation09.zip
+    reference_data: evaluation.zip
     scoring_program: scoring_program.zip
     start_date: 2019-07-08 00:00:00+00:00
   2:
@@ -48,7 +51,7 @@ phases:
     max_submissions: 999
     max_submissions_per_day: 999
     phasenumber: 3
-    reference_data: evaluation_gold.zip
+    reference_data: evaluation.zip
     scoring_program: scoring_program.zip
     start_date: 2019-07-23 00:00:00+00:00
 leaderboard:
