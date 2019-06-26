@@ -1,7 +1,10 @@
 all: competition/scoring_program.zip competition/training09.tgz competition/evaluation09.tgz competition/companion.tgz competition/sample.tgz competition.zip submission.zip
 
-competition/scoring_program.zip: scoring_program/*
-	cd scoring_program && git clone https://github.com/cfmrp/mtool && zip -r ../competition/scoring_program.zip * && cd ..
+competition/scoring_program.zip: scoring_program/* scoring_program/mtool
+	cd scoring_program && zip -r ../competition/scoring_program.zip * && cd ..
+
+scoring_program/mtool:
+    cd scoring_program && git clone https://github.com/cfmrp/mtool
 
 competition/training09.tgz: mrp
 	cd mrp/2019/training && make release && cd ../../.. && cp mrp/2019/training09.tgz competition/
