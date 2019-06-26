@@ -10,7 +10,7 @@ disallow_leaderboard_modifying: false
 enable_detailed_results: true
 admin_names: danielh,Omri.Abend,oe@ifi.uio.no.no
 html:
-  Overview: overview.html
+  overview: overview.html
 phases:
   0:
     auto_migration: false
