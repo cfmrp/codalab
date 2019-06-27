@@ -103,7 +103,8 @@ def main():
                                '</thead>\n'
                                '<tbody>\n')
 
-        graphs, _ = [graph for f in files for graph in read_graphs(f, format="mrp")]
+        with open(files[0], encoding="utf-8") as f:
+            graphs, _ = read_graphs(f, format="mrp")
         if not graphs:
             sys.exit("unable to read input graphs")
 
