@@ -38,14 +38,14 @@ def main():
         sys.exit("unable to read input graphs")
     print("validating %d graphs" % len(graphs))
 
-    log = StringIO
+    log = StringIO()
     n = sum(validate.core.test(graph, VALIDATIONS, stream=log)
             for graph in graphs)
     log = log.getvalue()
     print(log, file=sys.stderr)
 
-    with open(os.path.join(output_dir, 'scores.txt'), 'w') as output_file, \
-            open(os.path.join(output_dir, 'scores.html'), 'w') as output_html_file:
+    with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
+            open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
         print("<!DOCTYPE html>\n<html>\n<head>\n<style>\ntable {\n"
               "font-family: Tahoma, Geneva, sans-serif;\n"
               "border: 0px solid #000000;\n"
