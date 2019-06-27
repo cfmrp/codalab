@@ -2,7 +2,7 @@ title: 'CoNLL 2019 Shard Task on Cross-Framework Meaning Representation Parsing'
 description: Parsing DM, PSD, EDS, UCCA and AMR in English.
 start_date: 2019-06-25 00:00:00+00:00
 end_date: null
-competition_docker_image: danielh/mrp2019:1
+competition_docker_image: continuumio/anaconda3
 image: logo.png
 has_registration: true
 force_submission_to_leaderboard: false
