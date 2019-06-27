@@ -44,7 +44,8 @@ def main():
     gold_dir = os.path.join(input_dir, 'ref')
     files = find_files(submission_dir)
     gold_files = find_files(gold_dir)
-    metadata = yaml.load(open(os.path.join(input_dir, 'metadata'), 'r'))
+    metadata = yaml.load(open(os.path.join(input_dir, 'metadata'), 'r'),
+                         Loader=yaml.FullLoader)
     for key, value in metadata.items():
         print(key + ': ' + str(value))
     with open(os.path.join(output_dir, 'scores.txt'), 'w') as output_file, \
