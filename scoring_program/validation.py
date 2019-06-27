@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import os.path
 import sys
+from io import StringIO
 
 import yaml
-from StringIO import StringIO
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'mtool'))
 from main import read_graphs, VALIDATIONS
