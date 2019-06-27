@@ -3,6 +3,7 @@ import os.path
 import sys
 
 import yaml
+from StringIO import StringIO
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'mtool'))
 from main import read_graphs, VALIDATIONS
@@ -37,15 +38,36 @@ def main():
         sys.exit("unable to read input graphs")
     print("validating %d graphs" % len(graphs))
 
-    n = sum(validate.core.test(graph, VALIDATIONS, stream=sys.stderr)
+    log = StringIO
+    n = sum(validate.core.test(graph, VALIDATIONS, stream=log)
             for graph in graphs)
+    log = log.getvalue()
+    print(log, file=sys.stderr)
 
-    with open(os.path.join(output_dir, 'scores.txt'), 'w') as output_file:
+    with open(os.path.join(output_dir, 'scores.txt'), 'w') as output_file, \
+            open(os.path.join(output_dir, 'scores.html'), 'w') as output_html_file:
+        print("<!DOCTYPE html>\n<html>\n<head>\n<style>\ntable {\n"
+              "font-family: Tahoma, Geneva, sans-serif;\n"
+              "border: 0px solid #000000;\n"
+              "width: 100%;\nheight: 200px;\ntext-align: center;\n"
+              "border-collapse: collapse;\n}\n"
+              "td, th {\nborder: 1px solid #000000;\npadding: 3px 2px;\n}\n"
+              "tbody td {\nfont-size: 13px;\n}\n"
+              "thead {\nbackground: #0B6FA4;\n"
+              "border-bottom: 5px solid #000000;\n}\n"
+              "thead th {\nfont-size: 14px;\n"
+              "font-weight: bold;\ncolor: #FFFFFF;\ntext-align: center;\n"
+              "border-left: 2px solid #000000;\n}\n</style>\n"
+              "<title>Validation Results</title>\n</head>\n"
+              "<body>\n<h1>Validation Results</h1>\n"
+              "<pre>" + log + "</pre>"
+              "</tbody>\n</table>\n</body>\n</html>", file=output_html_file)
+
         if n:
             print("errors: %d" % n, file=output_file)
             sys.exit("%d validation errors occurred" % n)
         print("correct: 1", file=output_file)
-    print("wrote %s" % output_file)
+    print("done")
 
 
 if __name__ == "__main__":
