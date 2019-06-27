@@ -4,7 +4,7 @@ import sys
 
 import yaml
 
-sys.path.append('mtool')
+sys.path.append(os.path.join(os.path.dirname(__file__), 'mtool'))
 from main import read_graphs, VALIDATIONS
 import validate
 
