@@ -41,7 +41,7 @@ def main():
     log = StringIO()
     n = sum(validate.core.test(graph, VALIDATIONS, stream=log)
             for graph in graphs)
-    log = log.getvalue()
+    log = log.getvalue().strip()
     print(log, file=sys.stderr)
 
     with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
@@ -60,7 +60,7 @@ def main():
               "border-left: 2px solid #000000;\n}\n</style>\n"
               "<title>Validation Results</title>\n</head>\n"
               "<body>\n<h1>Validation Results</h1>\n"
-              "<pre>" + log + "</pre>"
+              "<pre>" + (log or "no errors.") + "</pre>"
               "</tbody>\n</table>\n</body>\n</html>", file=output_html_file)
 
         if n:
