@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os.path
+import re
 import sys
 from io import StringIO
 
@@ -42,7 +43,7 @@ def main():
     n = sum(validate.core.test(graph, VALIDATIONS, stream=log)
             for graph in graphs)
     log = log.getvalue().strip()
-    print(log, file=sys.stderr)
+    print(re.sub(r"[‘’]", "'", log), file=sys.stderr)
 
     with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
             open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
