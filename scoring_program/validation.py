@@ -46,7 +46,7 @@ def main():
 
     with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
             open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
-        print("<!DOCTYPE html>\n<html>\n<head>\n<style>\ntable {\n"
+        print("<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\ntable {\n"
               "font-family: Tahoma, Geneva, sans-serif;\n"
               "border: 0px solid #000000;\n"
               "width: 100%;\nheight: 200px;\ntext-align: center;\n"
