@@ -8,7 +8,7 @@ has_registration: true
 force_submission_to_leaderboard: false
 disallow_leaderboard_modifying: false
 enable_detailed_results: true
-admin_names: danielh,Omri.Abend,oe@ifi.uio.no.no
+admin_names: danielh,Omri.Abend,oe,oepen
 html:
   overview: overview.html
   evaluation: evaluation.html
