@@ -42,8 +42,8 @@ def main():
             for graph in graphs)
     log = log.getvalue().strip()
     if not log:
-        log = "validated %d graphs\n." \
-              "no errors." % len(graphs)
+        log = "validated %d graphs." \
+              "\nno errors." % len(graphs)
 
     # Check for mismatches between expected and found ids and targets
     expected_ids = {i for i, _ in TARGETS}
