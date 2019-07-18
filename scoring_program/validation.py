@@ -6,6 +6,8 @@ from io import StringIO
 
 import yaml
 
+sys.path.append(os.path.dirname(__file__))
+from targets import TARGETS
 sys.path.append(os.path.join(os.path.dirname(__file__), 'mtool'))
 from main import read_graphs, VALIDATIONS
 import validate
@@ -42,6 +44,23 @@ def main():
     if not log:
         log = "validated %d graphs\n." \
               "no errors." % len(graphs)
+
+    # Check for mismatches between expected and found ids and targets
+    expected_ids = {i for i, _ in TARGETS}
+    found_targets = {}
+    for graph in graphs:
+        found_targets.setdefault(graph.id, set()).add(graph.framework)
+        if graph.id not in expected_ids:
+            log += "\nunexpected id: '%s'" % graph.id
+    for i, targets in TARGETS:
+        found = found_targets.get(i)
+        if found:
+            log += "".join("\nunexpected target '%s' for id: '%s'" % (t, i) for t in targets - found)
+            log += "".join("\nmissing target '%s' for id: '%s'" % (t, i) for t in found - targets)
+        else:
+            log += "\nmissing id: '%s'" % i
+
+    # Report
     print(re.sub(r"[‘’]", "'", log), file=sys.stderr)
     with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
             open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
