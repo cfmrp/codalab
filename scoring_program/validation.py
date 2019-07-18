@@ -20,31 +20,29 @@ def find_files(submission_dir):
 def main():
     # as per the metadata file, input and output directories are the arguments
     [_, input_dir, output_dir] = sys.argv
-
     metadata = yaml.load(open(os.path.join(input_dir, 'metadata'), 'r'),
                          Loader=yaml.FullLoader)
     for key, value in metadata.items():
         print("%s: %s" % (key, value))
-
     submission_dir = os.path.join(input_dir, 'res')
     files = find_files(submission_dir)
     if len(files) != 1:
         sys.exit(("submission must include exactly one *.mrp file, but found %d:\n"
                   % len(files)) + "\n".join(files))
     print("validating %s" % files[0])
-
     with open(files[0], encoding="utf-8") as f:
         graphs, _ = read_graphs(f, format="mrp")
     if not graphs:
         sys.exit("unable to read input graphs")
     print("validating %d graphs" % len(graphs))
-
     log = StringIO()
     n = sum(validate.core.test(graph, VALIDATIONS, stream=log)
             for graph in graphs)
     log = log.getvalue().strip()
+    if not log:
+        log = "validated %d graphs\n." \
+              "no errors." % len(graphs)
     print(re.sub(r"[‘’]", "'", log), file=sys.stderr)
-
     with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
             open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
         print("<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\ntable {\n"
@@ -61,9 +59,8 @@ def main():
               "border-left: 2px solid #000000;\n}\n</style>\n"
               "<title>Validation Results</title>\n</head>\n"
               "<body>\n<h1>Validation Results</h1>\n"
-              "<pre>" + (log or "no errors.") + "</pre>"
-              "</tbody>\n</table>\n</body>\n</html>", file=output_html_file)
-
+              "<pre>" + log + "</pre>"
+                              "</tbody>\n</table>\n</body>\n</html>", file=output_html_file)
         if n:
             print("errors: %d" % n, file=output_file)
             sys.exit("%d validation errors occurred" % n)
