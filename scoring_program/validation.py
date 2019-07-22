@@ -55,8 +55,8 @@ def main():
     for i, targets in TARGETS:
         found = found_targets.get(i)
         if found:
-            log += "".join("\nunexpected target '%s' for id: '%s'" % (t, i) for t in targets - found)
-            log += "".join("\nmissing target '%s' for id: '%s'" % (t, i) for t in found - targets)
+            log += "".join("\nmissing target '%s' for id: '%s'" % (t, i) for t in targets - found)
+            # log += "".join("\nunexpected target '%s' for id: '%s'" % (t, i) for t in found - targets)
         else:
             log += "\nmissing id: '%s'" % i
 
