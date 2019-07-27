@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import os.path
 import re
 import sys
@@ -61,7 +62,7 @@ def main():
             log += "\nmissing id: '%s'" % i
 
     # Report
-    print(re.sub(r"[‘’]", "'", log), file=sys.stderr)
+    print(re.sub(u"[‘’]", "'", log), file=sys.stderr)
     with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
             open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
         print("<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\ntable {\n"
