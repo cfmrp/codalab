@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function
 
+import io
 import json
 import os.path
 import sys
@@ -25,7 +26,7 @@ def main():
         sys.exit(("submission must include exactly one *.mrp file, but found %d:\n"
                   % len(files)) + "\n".join(files))
     print("validating %s" % files[0])
-    with open(files[0], encoding="utf-8") as f:
+    with io.open(files[0], encoding="utf-8") as f:
         lines = list(f)
     if not lines:
         sys.exit("unable to read input graphs")
@@ -49,9 +50,9 @@ def main():
             log += "\nmissing id: '%s'" % i
 
     # Report
-    print(log, file=sys.stderr)
-    with open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
-            open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
+    sys.stderr.write(log.encode("utf-8"))
+    with io.open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
+            io.open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
         print("<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\ntable {\n"
               "font-family: Tahoma, Geneva, sans-serif;\n"
               "border: 0px solid #000000;\n"
@@ -68,7 +69,7 @@ def main():
               "<body>\n<h1>Validation Results</h1>\n"
               "<pre>" + log + "</pre>"
                               "</tbody>\n</table>\n</body>\n</html>", file=output_html_file)
-        print("correct: 1", file=output_file)
+        output_file.write(u"correct: 1")
     print("done")
 
 
