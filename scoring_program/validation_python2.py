@@ -36,8 +36,13 @@ def main():
     expected_ids = {i for i, _ in TARGETS}
     found_targets = {}
     log = ""
-    for line in lines:
-        graph = json.loads(line.rstrip())
+    errors = ""
+    for i, line in enumerate(lines):
+        try:
+            graph = json.loads(line.rstrip())
+        except ValueError:
+            errors += "Invalid json at line %d: %s\n" % (i, line)
+            continue
         found_targets.setdefault(graph.get("id"), set()).add(graph.get("framework"))
         if graph.get("id") not in expected_ids:
             log += "\nunexpected id: '%s'" % graph.get("id")
@@ -69,7 +74,10 @@ def main():
                                "<body>\n<h1>Validation Results</h1>\n"
                                "<pre>" + log + "</pre>"
                                                "</tbody>\n</table>\n</body>\n</html>")
-        output_file.write(u"correct: 1")
+        if errors:
+            sys.stderr.write(errors.encode("utf-8"))
+        else:
+            output_file.write(u"correct: 1")
     print("done")
 
 
