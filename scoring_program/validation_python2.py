@@ -6,8 +6,6 @@ import json
 import os.path
 import sys
 
-import yaml
-
 sys.path.append(os.path.dirname(__file__))
 from targets import TARGETS
 
@@ -21,10 +19,6 @@ def find_files(submission_dir):
 def main():
     # as per the metadata file, input and output directories are the arguments
     [_, input_dir, output_dir] = sys.argv
-    metadata = yaml.load(open(os.path.join(input_dir, 'metadata'), 'r'),
-                         Loader=yaml.FullLoader)
-    for key, value in metadata.items():
-        print("%s: %s" % (key, value))
     submission_dir = os.path.join(input_dir, 'res')
     files = find_files(submission_dir)
     if len(files) != 1:
