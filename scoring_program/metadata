@@ -1,2 +1,2 @@
-command: python $program/validation.py $input $output
+command: python $program/validation_python2.py $input $output
 description: competition evaluation program.
