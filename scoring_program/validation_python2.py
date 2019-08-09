@@ -53,22 +53,22 @@ def main():
     sys.stderr.write(log.encode("utf-8"))
     with io.open(os.path.join(output_dir, 'scores.txt'), 'w', encoding="utf-8") as output_file, \
             io.open(os.path.join(output_dir, 'scores.html'), 'w', encoding="utf-8") as output_html_file:
-        print("<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\ntable {\n"
-              "font-family: Tahoma, Geneva, sans-serif;\n"
-              "border: 0px solid #000000;\n"
-              "width: 100%;\nheight: 200px;\ntext-align: center;\n"
-              "border-collapse: collapse;\n}\n"
-              "td, th {\nborder: 1px solid #000000;\npadding: 3px 2px;\n}\n"
-              "tbody td {\nfont-size: 13px;\n}\n"
-              "thead {\nbackground: #0B6FA4;\n"
-              "border-bottom: 5px solid #000000;\n}\n"
-              "thead th {\nfont-size: 14px;\n"
-              "font-weight: bold;\ncolor: #FFFFFF;\ntext-align: center;\n"
-              "border-left: 2px solid #000000;\n}\n</style>\n"
-              "<title>Validation Results</title>\n</head>\n"
-              "<body>\n<h1>Validation Results</h1>\n"
-              "<pre>" + log + "</pre>"
-                              "</tbody>\n</table>\n</body>\n</html>", file=output_html_file)
+        output_html_file.write(u"<!DOCTYPE html>\n<html>\n<head>\n<meta charset=\"UTF-8\">\n<style>\ntable {\n"
+                               "font-family: Tahoma, Geneva, sans-serif;\n"
+                               "border: 0px solid #000000;\n"
+                               "width: 100%;\nheight: 200px;\ntext-align: center;\n"
+                               "border-collapse: collapse;\n}\n"
+                               "td, th {\nborder: 1px solid #000000;\npadding: 3px 2px;\n}\n"
+                               "tbody td {\nfont-size: 13px;\n}\n"
+                               "thead {\nbackground: #0B6FA4;\n"
+                               "border-bottom: 5px solid #000000;\n}\n"
+                               "thead th {\nfont-size: 14px;\n"
+                               "font-weight: bold;\ncolor: #FFFFFF;\ntext-align: center;\n"
+                               "border-left: 2px solid #000000;\n}\n</style>\n"
+                               "<title>Validation Results</title>\n</head>\n"
+                               "<body>\n<h1>Validation Results</h1>\n"
+                               "<pre>" + log + "</pre>"
+                                               "</tbody>\n</table>\n</body>\n</html>")
         output_file.write(u"correct: 1")
     print("done")
 
